@@ -1,0 +1,8 @@
+users:
+  vaibhav:
+    displayname: "Your Name"
+    password: "$argon2id$v=19$m=65536,t=3,p=4$I9afL1o1b1eh3W25Hwkmew$eyF1LrO2Q+OeJhwshC/ORQxIVbE6mcd+bLXcLuC32CU"
+    email: yourname@example.com
+    groups:
+      - admins
+

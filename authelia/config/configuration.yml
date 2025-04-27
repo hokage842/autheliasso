@@ -1,0 +1,37 @@
+server:
+  host: 0.0.0.0
+  port: 9091
+
+authentication_backend:
+  file:
+    path: /config/users.yml
+
+identity_validation:
+  reset_password:
+    jwt_secret: "cJHy+nMXfNeGeoZzLvp0Jplcu/mBRivPFKjfpXDfQ8g="
+session:
+  secret: '3/C78kTU6R5Y8xQzGznzXn8YXTJlkjs7yeb6TqJIxYI='  # Replace with a secure random string
+  domain: .domain.test
+  same_site: lax
+  expiration: 1h
+  inactivity: 30m
+
+access_control:
+  default_policy: deny
+  rules:
+    - domain: gitea.domain.test
+      policy: one_factor
+    - domain: auth.domain.test
+      policy: one_factor
+
+storage:
+  local:
+    path: /config/authelia.db  # Path to the local database file
+  encryption_key: 'InQS+gmSdlZqzZs7GpqBe7QXhOusuwhdjhhn3whskU='  
+
+notifier:
+  filesystem:
+    filename: /config/notifications.txt
+totp:
+  issuer: Authelia
+
