@@ -1,25 +1,26 @@
-Gitea, Grafana, and Authelia SSO Deployment with Nginx Reverse Proxy
+
+# Gitea, Grafana, and Authelia SSO Deployment with Nginx Reverse Proxy
 
 This document outlines the steps to deploy and access the Gitea, Grafana, and Authelia application stack, using Docker, Nginx as a reverse proxy, Certbot for SSL certificates, and nip.io for subdomain mapping.
-1. Prerequisites:-
-- Before proceeding with the deployment, ensure you have the following prerequisites:
+### Prerequisites:-
+* Before proceeding with the deployment, ensure you have the following prerequisites:
 
-    1. Docker installed and running on the host machine.
-    2. Docker Compose installed for managing multi-container applications.
-    3. Nginx installed and configured as a reverse proxy.
-    4. Certbot for obtaining SSL certificates.
-    5. nip.io for subdomain mapping to the public IP address.. 
+    * Docker installed and running on the host machine.
+    * Docker Compose installed for managing multi-container applications.
+    * Nginx installed and configured as a reverse proxy.
+    * Certbot for obtaining SSL certificates.
+    * nip.io for subdomain mapping to the public IP address.. 
 
-2. Clone the Repository on the server/local
-3. Modification in configuration file according to the need :-
-    1. authelia/config/configuration.yml       @ Authelia main configuration file
-    2. authelia/config/users.yml               @ Authelia Users/Password file
-    3. prometheus/prometheus.yml               @ Prometheus main confugtaion file with scrape-config, targets.
-    4. promtail/promtail.conf                  @ promtail config for getting the logs and passing to loki
+### Clone the Repository on the server/local
+### Modification in configuration file according to the need :-
+* authelia/config/configuration.yml       
+* authelia/config/users.yml               
+* prometheus/prometheus.yml              
+* promtail/promtail.conf
         
-3. Make the container up 
-    - docker-compose up -d
-4. Create the nginx.conf file as like shared below:-
+### Make the container up 
+    docker-compose up -d
+### Create the nginx.conf file as like shared below:-
 
         server {
             server_name domain_name.server_ip.nip.io;
@@ -53,8 +54,73 @@ This document outlines the steps to deploy and access the Gitea, Grafana, and Au
         }
 
 
-5. Setup SSL using Certbot
-6. Accessing the Services
-    1. Gitea - domain_name1.server_ip.nip.io;
-    2. Grafana - domain_name2.server_ip.nip.io;
-    3. Authelia - domain_name3.server_ip.nip.io;
+### Setup SSL using Certbot
+### Accessing the Services
+* Gitea - domain_name1.server_ip.nip.io;
+* Grafana - domain_name2.server_ip.nip.io;
+* Authelia - domain_name3.server_ip.nip.io; <br><br>
+
+
+# Additional: Setting infra using terraform
+
+### Requirements
+
+* AWS CLI v2.25
+* Terraform CLI v1.10
+
+### Usage
+
+* Create an IAM user with `AdministratorAccess` permissions and Create new Access key and Secret
+* Configure AWS CLI with newly created credentials
+
+```bash
+aws configure --profile creato
+aws sts get-caller-identity --profile creato
+```
+
+#### Create S3 Backend
+
+Create a `bootstrap/terraform.tfvars` file by coping the `bootstrap/example.tfvars`
+
+```bash
+cd bootstrap
+terraform init
+terraform validate
+terraform apply
+```
+
+This single S3 backend bucket will be used for all environments for this project.
+
+Note: :warning: The `bootstrap` folder saves the state on local disk.
+
+#### Create main infra
+
+```bash
+cd ..
+terraform init
+```
+
+* Create a `terraform.tfvars` file in root folder by coping the `example.tfvars`
+* :bulb: Ensure that the S3 Backend bucket name is same here
+
+* Deploy main infra for `dev` environment
+
+```bash
+terraform workspace new dev
+terraform workspace select dev
+terraform validate
+terraform plan
+terraform apply
+```
+
+You can repeat the same for other environment like `prod`
+
+```bash
+terraform workspace new prod
+terraform workspace select prod
+terraform validate
+terraform plan
+terraform apply
+```
+
+:warning: Dont use `default` workspace
